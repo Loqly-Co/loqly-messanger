@@ -1,0 +1,83 @@
+﻿version: "3"
+services:
+
+  postgres-main:
+    image: postgres:14.1
+    container_name: msg_main_postgres
+    ports:
+      - ${MAINPG_PORT}:5432
+    environment:
+      POSTGRES_DB: ${MAINPG_DB}
+      POSTGRES_USER: main_pg
+      POSTGRES_PASSWORD: ${MAINPG_PASSWORD}
+    volumes:
+      - ./init-db.sql:/docker-entrypoint-initdb.d/1_init-db.sql
+  
+  #  
+  #  kafka:
+  #    image: bitnamilegacy/kafka:3.8.0
+  #    container_name: ls_kafka
+  #    ports:
+  #      - ${KAFKA_PORT}:9093
+  #    environment:
+  #      # KRaft
+  #      KAFKA_KRAFT_MODE: "true"
+  #      KAFKA_CFG_NODE_ID: 0
+  #      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@localhost:9092
+  #      KAFKA_CFG_PROCESS_ROLES: controller,broker
+  #      # Listeners
+  #      KAFKA_CFG_LISTENERS: BROKER://0.0.0.0:${KAFKA_PORT},PLAINTEXT://0.0.0.0:9092
+  #      KAFKA_CFG_LISTENER_NAME_CONTROLLER: BROKER
+  #      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: PLAINTEXT
+  #      KAFKA_CFG_ADVERTISED_LISTENERS: BROKER://localhost:${KAFKA_PORT}
+  #      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,BROKER:PLAINTEXT
+  #      KAFKA_INTER_BROKER_LISTENER_NAME: BROKER
+  #      KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+  #      KAFKA_CFG_SASL_ENABLED_MECHANISMS: PLAIN
+  #      KAFKA_CFG_SASL_MECHANISM_CONTROLLER_PROTOCOL: PLAIN
+  #      CLUSTER_ID: "Mk3OEYBSD34fcwNTJENDM2Qk"
+  
+  minio:
+    image: minio/minio:RELEASE.2024-10-29T16-01-48Z
+    container_name: msg_minio
+    ports:
+      - ${MINIO_PORT}:9000
+      - ${MINIO_ADMIN_PORT}:9001
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USERNAME}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    volumes:
+      - ./minio_data:/data
+    command: server --console-address :9001 /data && mc mb myminio/test
+  
+  redis:
+    image: redis:7.4.1
+    container_name: msg_redis
+    hostname: ${REDIS_HOST}
+    ports:
+      - ${REDIS_PORT}:6379
+  
+  rabbitmq:
+    image: rabbitmq:4.0-management
+    container_name: msg_rabbitmq
+    hostname: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "${RABBITMQ_PORT}:5672"
+      - "${RABBITMQ_UI_PORT}:15672"
+      - "${RABBITMQ_STOMP_PORT}:61613"
+      - "${RABBITMQ_WEB_STOMP_PORT}:15674"
+    environment:
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_USR}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PWD}"
+    volumes: 
+      - "rabbitmq_data:/var/lib/rabbitmq"
+    command: >
+      bash -c "
+        rabbitmq-plugins enable --offline rabbitmq_stomp &&
+        rabbitmq-plugins enable --offline rabbitmq_web_stomp &&
+        rabbitmq-server
+      "
+
+volumes:
+  rabbitmq_data:

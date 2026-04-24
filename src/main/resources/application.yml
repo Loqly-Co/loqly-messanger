@@ -1,0 +1,35 @@
+server:
+  shutdown: graceful
+
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  threads:
+    virtual:
+      enabled: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USR}
+    password: ${RABBITMQ_PWD}
+
+rabbitmq:
+  stompPort: ${RABBITMQ_STOMP_PORT}
+
+jwt:
+  secret: ${JWT_USER}
+  #  AccessToken: 15 ????? (900,000 ???????????).
+  #  RefreshToken: 7 ???? (604,800,000 ???????????).
+  access-token-expiration: 900000
+  refresh-token-expiration: 604800000
+
+redis:
+  host: ${REDIS_HOST}
+  port: ${REDIS_PORT}
+  password: ${REDIS_PWD}
+
+logging:
+  level:
+    org.springframework.web.socket: ${LOGGING_LEVEL}
+    org.springframework.messaging: ${LOGGING_LEVEL}
+    org.springframework.security: ${LOGGING_LEVEL}
