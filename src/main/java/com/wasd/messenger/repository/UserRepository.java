@@ -1,20 +1,10 @@
 package com.wasd.messenger.repository;
 
 import com.wasd.messenger.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
-public interface UserRepository {
-	
-	boolean existsById(UUID id);
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-	User save(User user);
-
-	Optional<User> findById(UUID id);
-
-	Optional<User> findByPeopleMain_Email(String email);
-
-	Set<String> findAllByIdIn(Set<UUID> ids);
 }

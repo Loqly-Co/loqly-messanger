@@ -15,8 +15,12 @@ public interface UserService {
 	boolean existsById(UUID id);
 
 	User getById(UUID id);
+	
+	String getUsername(UUID id);
 
 	Optional<User> findByEmail(String email);
 
 	Set<String> findUsernamesByIds(Set<UUID> ids);
+	
+	public String findUsernameByUser(User user);
 }

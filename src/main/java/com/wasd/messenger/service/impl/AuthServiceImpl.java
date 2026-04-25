@@ -2,9 +2,10 @@ package com.wasd.messenger.service.impl;
 
 import com.wasd.messenger.data.request.LoginRequest;
 import com.wasd.messenger.data.response.LoginResponse;
-import com.wasd.messenger.entity.PeopleMain;
+import com.wasd.messenger.entity.PersonMain;
 import com.wasd.messenger.entity.Reference;
 import com.wasd.messenger.entity.User;
+import com.wasd.messenger.exception.UnauthorizedActionException;
 import com.wasd.messenger.service.AuthService;
 import com.wasd.messenger.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -29,18 +30,21 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public LoginResponse login(LoginRequest request) {
 		Optional<User> optionalUser = userService.findByEmail(request.email());
-		//todo exception
+
 		if (optionalUser.isEmpty()) {
-			throw new RuntimeException("Email or password invalid");
+			throw new UnauthorizedActionException();
 		}
 		User user = optionalUser.get();
-		//todo exception
+
 		if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-			throw new RuntimeException("Email or password invalid");
+			throw new UnauthorizedActionException();
 		}
+		
+		String username = userService.getUsername(user.getId());
+		
 		return new LoginResponse(
 			user.getId(),
-			user.getPeopleMain().getUsername(),
+			username,
 			user.getRoles().stream()
 				.map(Reference::getNote)
 				.collect(Collectors.toSet())
@@ -48,13 +52,12 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public void checkIsCurrentUser(PeopleMain peopleMain) {
+	public void checkIsCurrentUser(PersonMain personMain) {
 		var user = getCurrentUser();
-		if (checkEntitiesNotNullAndEquals(peopleMain, user)) {
+		if (checkEntitiesNotNullAndEquals(personMain, user)) {
 			return;
 		}
-		//todo exception
-		throw new RuntimeException("Current user is not current");
+		throw new UnauthorizedActionException();
 	}
 
 	@Override
@@ -73,12 +76,12 @@ public class AuthServiceImpl implements AuthService {
 			permission);
 	}
 
-	private boolean checkEntitiesNotNullAndEquals(PeopleMain peopleMain, User user) {
-		return checkPeopleMainAndUsersExistsAndNotNull(peopleMain, user) && user.getPeopleMain().getId().equals(peopleMain.getId());
+	private boolean checkEntitiesNotNullAndEquals(PersonMain personMain, User user) {
+		return checkPeopleMainAndUsersExistsAndNotNull(personMain, user) && personMain.getUser().getId().equals(user.getId());
 	}
 
-	private boolean checkPeopleMainAndUsersExistsAndNotNull(PeopleMain peopleMain, User user) {
-		return user != null && peopleMain != null && user.getPeopleMain() != null && peopleMain.getId() != null &&
-			   user.getPeopleMain().getId() != null;
+	private boolean checkPeopleMainAndUsersExistsAndNotNull(PersonMain personMain, User user) {
+		return user != null && personMain != null && personMain.getUser() != null && personMain.getId() != null &&
+			   user.getId() != null && personMain.getUser().getId() != null;
 	}
 }

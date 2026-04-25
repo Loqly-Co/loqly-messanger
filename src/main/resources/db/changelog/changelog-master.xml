@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+    <preConditions>
+        <dbms type="postgresql"/>
+    </preConditions>
+
+    <include relativeToChangelogFile="true" file="2026/25-4-initial/ref_header/changelog.xml"/>
+    <include relativeToChangelogFile="true" file="2026/25-4-initial/reference/changelog.xml"/>
+    <include relativeToChangelogFile="true" file="2026/25-4-initial/user/changelog.xml"/>
+    <include relativeToChangelogFile="true" file="2026/25-4-initial/person_main/changelog.xml"/>
+    
+</databaseChangeLog>
+    

@@ -2,24 +2,57 @@ server:
   shutdown: graceful
 
 spring:
+  
   lifecycle:
     timeout-per-shutdown-phase: 30s
+  
   threads:
     virtual:
       enabled: true
+      
   rabbitmq:
     host: ${RABBITMQ_HOST}
     port: ${RABBITMQ_PORT}
     username: ${RABBITMQ_USR}
     password: ${RABBITMQ_PWD}
+    
+  datasource:
+    driver-class-name: ${POSTGRES_JDBC_DRIVER_NAME}
+    username: ${MAINPG_USER}
+    password: ${MAINPG_PASSWORD}
+    url: ${MAINPG_URL}
+    
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      properties:
+        hibernate.transaction.jta.platform: org.hibernate.engine.transaction.internal.jdbc.JdbcTransactionFactory
+        hibernate:
+          globally_quoted_identifiers: true
+          show_sql: false
+          use_sql_comments: true
+          format_sql: true
+        
+  liquibase:
+    change-log: classpath:db/changelog/changelog-master.xml
+    enabled: true
+    
+  web:
+    locale: en
+    
+2fa:
+  issuer: ${TWO_FA_ISSUER} 
+  life: ${TWO_FA_LIFE}
 
 rabbitmq:
   stompPort: ${RABBITMQ_STOMP_PORT}
 
 jwt:
   secret: ${JWT_USER}
-  #  AccessToken: 15 ????? (900,000 ???????????).
-  #  RefreshToken: 7 ???? (604,800,000 ???????????).
+  #  AccessToken: 15 (900,000).
+  #  RefreshToken: 7 (604,800,000)
   access-token-expiration: 900000
   refresh-token-expiration: 604800000
 
