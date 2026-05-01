@@ -41,10 +41,19 @@ spring:
     
   web:
     locale: en
-    
-2fa:
-  issuer: ${TWO_FA_ISSUER} 
-  life: ${TWO_FA_LIFE}
+
+feign:
+  cloudflare:
+    turnstile:
+      url: https://challenges.cloudflare.com
+      name: loqly-turnstile-client
+   
+auth:
+  captcha:
+    secretKey: ${CAPTCHA_SECRET_KEY}
+  2fa:
+    issuer: ${TWO_FA_ISSUER} 
+    life: ${TWO_FA_LIFE}
 
 rabbitmq:
   stompPort: ${RABBITMQ_STOMP_PORT}
