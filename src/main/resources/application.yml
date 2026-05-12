@@ -43,10 +43,9 @@ spring:
     locale: en
 
 feign:
-  cloudflare:
-    turnstile:
-      url: https://challenges.cloudflare.com
-      name: loqly-turnstile-client
+  google:
+    url: https://www.google.com
+    name: google-client
    
 auth:
   captcha:
@@ -75,3 +74,7 @@ logging:
     org.springframework.web.socket: ${LOGGING_LEVEL}
     org.springframework.messaging: ${LOGGING_LEVEL}
     org.springframework.security: ${LOGGING_LEVEL}
+    
+credentials:
+  google:
+    path: ${GOOGLE_CREDS_PATH}

